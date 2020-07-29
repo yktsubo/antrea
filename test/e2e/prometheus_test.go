@@ -254,8 +254,8 @@ func testMetricsFromPrometheusServer(t *testing.T, data *TestData, prometheusJob
 	hostIP, nodePort := getPrometheusEndpoint(t, data)
 
 	// Build the Prometheus query URL
-	path := url.PathEscape("match[]={job=\"" + prometheusJob + "\"}")
-	queryUrl := fmt.Sprintf("http://%s:%d/api/v1/series?%s", hostIP, nodePort, path)
+	path := url.PathEscape("match_target={job=\"" + prometheusJob + "\"}")
+	queryUrl := fmt.Sprintf("http://%s:%d/api/v1/targets/metadata?%s", hostIP, nodePort, path)
 
 	client := &http.Client{}
 	resp, err := client.Get(queryUrl)
@@ -279,8 +279,7 @@ func testMetricsFromPrometheusServer(t *testing.T, data *TestData, prometheusJob
 	// Create a map of all the metrics which were found on the server
 	testMap := make(map[string]bool)
 	for _, metric := range output.Data {
-		name := strings.TrimSuffix(metric["__name__"], "_bucket")
-		testMap[name] = true
+		testMap[metric["metric"]] = true
 	}
 
 	// Validate that all the required metrics exist in the server's output
