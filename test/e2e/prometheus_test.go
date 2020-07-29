@@ -66,7 +66,9 @@ var prometheusEnabled bool
 // Prometheus server JSON output
 type prometheusServerOutput struct {
 	Status string
-	Data   []map[string]string
+	Data   []struct {
+		Metric string
+	}
 }
 
 func init() {
@@ -279,7 +281,7 @@ func testMetricsFromPrometheusServer(t *testing.T, data *TestData, prometheusJob
 	// Create a map of all the metrics which were found on the server
 	testMap := make(map[string]bool)
 	for _, metric := range output.Data {
-		testMap[metric["metric"]] = true
+		testMap[metric.Metric] = true
 	}
 
 	// Validate that all the required metrics exist in the server's output
